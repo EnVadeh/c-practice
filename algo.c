@@ -68,7 +68,7 @@ void* retreive(mutableArray* mArray, uint16_t index){
 int main(){
   mutableArray* arr = initArray(TYPE_UINT);
   resize(arr, 10);
-  int value = 1000;
+  int value = 2000;
   insert(arr, &value, 5);
   int* x = (int*)retreive(arr, 5);
   printf("The retrieved value is: %d", *x); //dereferencing the pointer
