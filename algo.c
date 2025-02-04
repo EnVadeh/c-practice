@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 typedef struct{
   void* mPointer;
@@ -106,6 +107,44 @@ void addNode(node* rootNode, void* data, dataType type, char* direction){
 
 void deleteNode();//Main thing is how to delete it? do I take a value? check value? do I just delete by index??? 
 
+//Let's write a quaternion
+typedef struct{
+  double x;
+  double y;
+  double z;
+}vec3;
+
+double dot(vec3* u, vec3* v){
+  double d = u->x*v->x + u->y*v->y + u->z*v->z;
+  return d;
+}
+
+vec3* cross(vec3* u, vec3* v){
+  vec3* temp = (vec3*)malloc(sizeof(vec3));
+  temp->x = ((u->y * v->z) - (u->z * v->y));
+  temp->y = ((u->z * v->x) - (u->x * v->z));
+  temp->z = ((u->x * v->y) - (u->y * v->x));
+  return temp;
+}
+
+double length(vec3* u){
+  double l = (u->x * u->x) + (u->y * u->y) + (u->z * u->z); 
+  l = sqrt(l);
+  return l;
+}
+
+typedef struct{
+  vec3* v; //vector component
+  double s; //scalar component
+}quaternion; 
+
+//if I want to free the 'u' and have only the v to have data, then I should do memcpy and free. 
+quaternion* init(vec3* u, double x){
+  quaternion* q = (quaternion*)malloc(sizeof(quaternion));
+  q->v = u;
+  q->s = x; 
+  return q;
+}
 
 int main(){
   mutableArray* arr = initArray(TYPE_UINT);
