@@ -114,12 +114,44 @@ typedef struct{
   double z;
 }vec3;
 
-double dot(vec3* u, vec3* v){
+vec3* vInitA(double s){
+  vec3* temp = (vec3*)malloc(sizeof(vec3));
+  temp->x = s;
+  temp->y = s;
+  temp->z = s;
+  return temp;
+}
+
+vec3* vInitM(double s1, double s2, double s3){
+  vec3* temp = (vec3*)malloc(sizeof(vec3));
+  temp->x = s1;
+  temp->y = s2;
+  temp->z = s3;
+  return temp;
+}
+vec3* vAdd(vec3* u, vec3* v){
+  vec3* temp = (vec3*)malloc(sizeof(vec3));
+  temp->x = u->x + v->x;
+  temp->y = u->y + v->y;
+  temp->z = u->z + v->z;
+  return temp;
+}
+
+vec3* vProduct(vec3* u, double s){
+  vec3* temp = (vec3*)malloc(sizeof(vec3));
+  //I originally just wanted to return u by multiplying itself with s, but I think sometimes I want the original unproducted vector too.
+  temp->x = u->x * s;
+  temp->y = u->y * s;
+  temp->z = u->z * s;
+  return temp;
+}
+
+double vDot(vec3* u, vec3* v){
   double d = u->x*v->x + u->y*v->y + u->z*v->z;
   return d;
 }
 
-vec3* cross(vec3* u, vec3* v){
+vec3* vCross(vec3* u, vec3* v){
   vec3* temp = (vec3*)malloc(sizeof(vec3));
   temp->x = ((u->y * v->z) - (u->z * v->y));
   temp->y = ((u->z * v->x) - (u->x * v->z));
@@ -127,7 +159,7 @@ vec3* cross(vec3* u, vec3* v){
   return temp;
 }
 
-double length(vec3* u){
+double vLength(vec3* u){
   double l = (u->x * u->x) + (u->y * u->y) + (u->z * u->z); 
   l = sqrt(l);
   return l;
@@ -139,11 +171,29 @@ typedef struct{
 }quaternion; 
 
 //if I want to free the 'u' and have only the v to have data, then I should do memcpy and free. 
-quaternion* init(vec3* u, double x){
+quaternion* qInit(vec3* u, double x){
   quaternion* q = (quaternion*)malloc(sizeof(quaternion));
   q->v = u;
   q->s = x; 
   return q;
+}
+
+quaternion* qProduct(quaternion* q1, quaternion* q2){
+  quaternion* temp = (quaternion*)malloc(sizeof(quaternion));
+  double w1 = q1->s;
+  double w2 = q2->s;
+  /*
+  vec3* t = (vec3*) malloc(sizeof(vec3));
+  t->x = u1->x * w2 + u1->y * u2->z - u1->z * u2->y + w1 * u2->x;
+  t->y = u1->y * w2 + u1->z * u2->x - w1 * u2->y + u1->x * u2->z;
+  t->z = u1->z * w2 + w1 * u2->z - u1->x * u2->y + u1->y * u2->x;
+  temp->v = t;
+  temp->s = w1 * w2 - u1->x * u2->x - u1->y * u2->y - u1->z * u2->z;
+  */
+  temp->v = vAdd(vCross(q1->v, q2->v),vProduct(q1->v, w2));
+  temp->v = vAdd(temp->v, vProduct(q2->v, w1));
+  temp->s = w1*w2 - vDot(q1->v, q2->v);
+  return temp;
 }
 
 int main(){
@@ -155,6 +205,11 @@ int main(){
   int* x = (int*)retreive(arr, 5);
   printf("The retrieved value is: %d", *x); //dereferencing the pointer
   insert(arr, &value2, 5);
-  printf("another value is: %d", *(int*)retreive(arr, 5));
+  printf("\n another value is: %d", *(int*)retreive(arr, 5));
+  vec3* testVec = vInitA(3.0);
+  quaternion* q1 = qInit(testVec, 5.0);
+  quaternion* q2 = qInit(testVec, 11.0);
+  quaternion* qTest = qProduct(q1, q2);
+  printf("\n The quaternion is: %f %f %f",qTest->v->x,qTest->v->y,qTest->s);
   return 0;
 }
