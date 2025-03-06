@@ -76,6 +76,9 @@ node* initNode(void* data, dataType type){
   node* tempNode;
   tempNode->mData = malloc(type);
   tempNode->mType = type;
+  //I'm initialising the left and right pointer of the node to NULL. I don't know if this will destroy things up
+  tempNode->left = NULL;
+  tempNode->right = NULL;
   return tempNode;
 }
 
@@ -105,7 +108,39 @@ void addNode(node* rootNode, void* data, dataType type, char* direction){
   return;
 }
 
-void deleteNode();//Main thing is how to delete it? do I take a value? check value? do I just delete by index??? 
+
+//So to delete a linked list, I can either do it from key value or from the position
+//First I'll try the position one..
+//Then I'll try the value one...
+//Then I'll try to delete the entire linkedlist, cascading style
+void deleteNodeByValue(void* data, dataType type, node* currentNode){
+  //I'll have to implement closure or something so taht there's a value that stays in 
+  //even when I'm changing stuff
+  node* originalNode = currentNode;
+  node* tempNode = currentNode;
+  while(tempNode != NULL){
+    if(tempNode->mType == type){
+      if(tempNode->mData == data){
+        tempNode->right->left=tempNode->left;
+        free(tempNode);
+        return;
+      }
+    }
+    tempNode = tempNode->left;
+  }
+  tempNode = originalNode->right;
+  while(tempNode != NULL){
+    if(tempNode->mType == type){
+      if(tempNode->mData == data){
+        tempNode->left->right=tempNode->right;
+        free(tempNode);
+        return;
+      }
+    }
+    tempNode = tempNode->right;
+  }
+};//Main thing is how to delete it? do I take a value? check value? do I just delete by index??? 
+
 
 //Let's write a quaternion
 typedef struct{
@@ -203,13 +238,13 @@ int main(){
   int value2 = 3000;
   insert(arr, &value, 5);
   int* x = (int*)retreive(arr, 5);
-  printf("The retrieved value is: %d", *x); //dereferencing the pointer
+  //printf("The retrieved value is: %d", *x); //dereferencing the pointer
   insert(arr, &value2, 5);
-  printf("\n another value is: %d", *(int*)retreive(arr, 5));
+  //printf("\n another value is: %d", *(int*)retreive(arr, 5));
   vec3* testVec = vInitA(3.0);
   quaternion* q1 = qInit(testVec, 5.0);
   quaternion* q2 = qInit(testVec, 11.0);
   quaternion* qTest = qProduct(q1, q2);
-  printf("\n The quaternion is: %f %f %f",qTest->v->x,qTest->v->y,qTest->s);
+  //printf("\n The quaternion is: %f %f %f",qTest->v->x,qTest->v->y,qTest->s);
   return 0;
 }
